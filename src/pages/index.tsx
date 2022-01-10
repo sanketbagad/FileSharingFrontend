@@ -2,6 +2,7 @@ import Delete from "@components/Delete";
 import DownloadFile from "@components/DownloadFile";
 import DropZoneComponent from "@components/Dropzone";
 import RenderFile from "@components/RenderFile";
+import EmailForm from "@components/EmailForm"
 import axios from "axios";
 import { useState } from "react";
 export default function Home() {
@@ -64,6 +65,7 @@ export default function Home() {
         downloadPageLink && (
           <div className="p-2 text-center">
          <DownloadFile downloadPageLink={downloadPageLink} />
+          <EmailForm />
           <button onClick={resetComponent} className="w-44 focus:outline-none bg=gray-900 p-2 my-5 rounded-md">
             Upload New File
           </button>
