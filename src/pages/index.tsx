@@ -16,12 +16,12 @@ export default function Home() {
     setUploadState("Uploading");
    
     const formdata = new FormData();
-    formdata.append("myfile", file)
+    formdata.append("myFile", file)
     try {
       const {data} =  await axios({
         method: "post",
         data: formdata,
-        url: "api/file/upload",
+        url: "api/files/upload",
         headers: {
           "Content-Type": "multipart/form-data"
         }
