@@ -48,4 +48,4 @@ const DropZoneComponent: FunctionComponent<{ setFile: Dispatch<any> }> = ({
   );
 };
 
-export default DropZoneComponent
+export default DropZoneComponent;

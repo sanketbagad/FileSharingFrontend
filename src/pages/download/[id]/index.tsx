@@ -1,37 +1,27 @@
+import RenderFile from "@components/RenderFile";
 import axios from "axios";
-import { GetServerSidePropsContext } from "next";
-import { sizeInMB } from "../../../utils/sizeInMb";
+import { IFile } from "libs/types";
+import { GetServerSidePropsContext, NextPage } from "next";
 import fileDownload from "js-file-download";
-
-const download = ({ file: { id, filename, size } }) => {
+const index: NextPage<{
+  file: IFile;
+}> = ({ file: { format, name, sizeInBytes, id } }) => {
   const handleDownload = async () => {
-    const { data } = await axios(`api/files/${id}/download`, {
-      responseType: "blob", 
+    const { data } = await axios.get(`api/files/${id}/download`, {
+      responseType: "blob",
     });
-
-    fileDownload(data, filename);
+    fileDownload(data, name);
   };
+
   return (
-    <div className="flex flex-col items-center justify-center py-3 space-y-3 bg-gray-800 rounded-md shadow-2xl w-96">
-      {!id && (
-        <span className=" w-80 button">
-          oops! File Not Found, Check the URL
-          <br />
-        </span>
-      )}
-      {id && (
+    <div className="flex flex-col items-center justify-center py-3 space-y-4 bg-gray-800 rounded-md shadow-xl w-96">
+      {!id ? (
+        <span>oops! File does not exist! check the URL</span>
+      ) : (
         <>
           <img src="/images/file-download.png" alt="" className="w-16 h-16" />
-          <h1 className="text-xl">Your file is ready to download</h1>
-          <div className="flex items-center p-2 space-y-3 ">
-            <img
-              src={`/images/${filename.split(".")[1].toLowerCase()}.png`}
-              alt={filename}
-              className="w-14 h-14"
-            />
-            <span className="mx-2">{filename}</span>
-            <span className="ml-auto ">{`${sizeInMB(size)} MB`}</span>
-          </div>
+          <h1 className="text-xl">Your file is ready to be downloaded</h1>
+          <RenderFile file={{ format, name, sizeInBytes }} />
           <button className="button" onClick={handleDownload}>
             Download
           </button>
@@ -40,27 +30,25 @@ const download = ({ file: { id, filename, size } }) => {
     </div>
   );
 };
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { id } = ctx.query;
 
+export default index;
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { id } = context.query;
+  let file;
   try {
     const { data } = await axios.get(
       `${process.env.API_BASE_ENDPOINT}api/files/${id}`
     );
-
-    return {
-      props: {
-        file: data,
-      },
-    };
+    file = data;
   } catch (error) {
-    console.log(error);
-
-    return {
-      props: {
-        file: {},
-      },
-    };
+    console.log(error.response.data);
+    file = {};
   }
-};
-export default download;
+
+  return {
+    props: {
+      file,
+    }, // will be passed to the page component as props
+  };
+}
